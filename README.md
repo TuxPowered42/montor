@@ -1,13 +1,13 @@
 # Description
-This programm gets list of checks for current host from nagios, puts it into a temp CONFIG_FILE and then runs checks on host directly
-It will display it collorfull in term of exit code of plugin
+This program gets list of checks for current host from nagios, puts it into a temp CONFIG_FILE and then runs checks on host directly
+It will display it colorful in term of exit code of plugin
 exit 0 - Green background
 exit 1 - Yellow background
 exit 2 - Red background
 
 # Usage
 - -s
-        Print nrpe configs which will be used for execution of check localy
+        Prints nrpe configs which are used for execution of check locally
 
 # Examples
 - mon  
