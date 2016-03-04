@@ -1,0 +1,3 @@
+URL='https://nagios.example.com'
+USER='user'
+PASSWORD='password'

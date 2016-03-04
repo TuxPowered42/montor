@@ -1,0 +1,54 @@
+#!/bin/bash
+
+help_message="\n
+This programm gets list of checks for current host from nagios, puts it into a temp CONFIG_FILE\n
+and then runs checks on host directly\n
+Use -s option to print command, which will be execution\n
+USAGE: \n\t$0 -s\n
+AUTHOR: \n\thttps://github.com/leoleovich"
+
+while getopts ":s" OPTION; do
+	case "$OPTION" in
+		s)      SHOW="YES" ;;
+                *)      echo -e $help_message && exit 1 ;;
+        esac
+done
+
+source $(dirname $0)/nagios
+
+OK="\033[37;1;42mMESSAGE\033[0m"
+WARNING="\033[37;1;43mMESSAGE\033[0m"
+CRITICAL="\033[37;1;41mMESSAGE\033[0m"
+CONFIG_FILE="/tmp/checks_config"
+
+TEMP_CONFIG_FILE="/tmp/checks_config_temp"
+
+curl -s $URL/config --user $USER:$PASSWORD > $CONFIG_FILE 2>/dev/null || echo "You do not have https access to monitor"
+
+grep "^command\[.*\]" /etc/nagios/nrpe* 2>/dev/null >> $CONFIG_FILE
+grep "^command\[.*\]" /etc/nagios/nrpe.d/* 2>/dev/null >> $CONFIG_FILE
+sort < $CONFIG_FILE | uniq > $TEMP_CONFIG_FILE
+mv $TEMP_CONFIG_FILE $CONFIG_FILE
+
+curl --silent -L  "$URL/thruk/cgi-bin/status.cgi?hidesearch=2&s0_op=~&s0_type=search&s0_value=ho%3A$(hostname)" --user $USER:$PASSWORD | grep "service=" | sed -e "s/.*service=//g" -e "s/&amp;.*//g" 2>/dev/null |
+while read check
+do
+	command=$(grep "\[$check\]" $CONFIG_FILE | tail -1 | sed -e "s/.*]\ *\?=//g")
+	if ! [ -z "$command" ] ; then
+		if [ "$SHOW" == "YES" ]; then
+			echo $(grep "\[$check\]" $CONFIG_FILE | tail -1)
+		fi
+		result=$(sudo -u nagios bash -c "$command" 2>/dev/null)
+		case $? in
+			0)
+				echo -e "$(echo $OK | sed -e "s/MESSAGE/$check/g") - $(echo $result | sed -e 's/|.*//g')"
+				;;
+			1)
+				echo -e "$(echo $WARNING | sed -e "s/MESSAGE/$check/g") - $(echo $result | sed -e 's/|.*//g')"
+				;;
+			2)
+				echo -e "$(echo $CRITICAL | sed -e "s/MESSAGE/$check/g") - $(echo $result | sed -e 's/|.*//g')"
+				;;
+		esac
+	fi
+done
