@@ -14,7 +14,7 @@ while getopts ":s" OPTION; do
         esac
 done
 
-source $(dirname $0)/nagios
+source $(dirname $0)/nagios_config
 
 OK="\033[37;1;42mMESSAGE\033[0m"
 WARNING="\033[37;1;43mMESSAGE\033[0m"
