@@ -1,9 +1,9 @@
 # Description
-This program gets list of checks for current host from nagios, puts it into a temp CONFIG_FILE and then runs checks on host directly
-It will display it colorful in term of exit code of plugin
-exit 0 - Green background
-exit 1 - Yellow background
-exit 2 - Red background
+This program gets list of checks for current host from nagios, puts it into a temp CONFIG_FILE and then runs checks on host directly.  
+It will display it colorful in term of exit code of plugin  
+- exit 0 - Green background  
+- exit 1 - Yellow background  
+- exit 2 - Red background  
 
 # Usage
 - -s
