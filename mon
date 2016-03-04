@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 help_message="\n
 This programm gets list of checks for current host from nagios, puts it into a temp CONFIG_FILE\n
@@ -14,41 +14,52 @@ while getopts ":s" OPTION; do
         esac
 done
 
-source $(dirname $0)/nagios_config
+. $(dirname $0)/nagios_config
 
-OK="\033[37;1;42mMESSAGE\033[0m"
-WARNING="\033[37;1;43mMESSAGE\033[0m"
-CRITICAL="\033[37;1;41mMESSAGE\033[0m"
+case $(uname) in
+	Linux)
+		OK="\033[37;1;42mMESSAGE\033[0m"
+		WARNING="\033[37;1;43mMESSAGE\033[0m"
+		CRITICAL="\033[37;1;41mMESSAGE\033[0m"
+	;;
+	*BSD)
+		# echo both builtin and /bin/echo seem a bit retarded here
+		OK="MESSAGE"
+		WARNING="MESSAGE"
+		CRITICAL="MESSAGE"
+	;;
+esac
+
 CONFIG_FILE="/tmp/checks_config"
 
 TEMP_CONFIG_FILE="/tmp/checks_config_temp"
 
 curl -s $URL/config --user $USER:$PASSWORD > $CONFIG_FILE 2>/dev/null || echo "You do not have https access to monitor"
 
-grep "^command\[.*\]" /etc/nagios/nrpe* 2>/dev/null >> $CONFIG_FILE
-grep "^command\[.*\]" /etc/nagios/nrpe.d/* 2>/dev/null >> $CONFIG_FILE
+grep -R "^command\[.*\]" /etc/nagios/nrpe* 2>/dev/null >> $CONFIG_FILE
 sort < $CONFIG_FILE | uniq > $TEMP_CONFIG_FILE
 mv $TEMP_CONFIG_FILE $CONFIG_FILE
 
-curl --silent -L  "$URL/thruk/cgi-bin/status.cgi?hidesearch=2&s0_op=~&s0_type=search&s0_value=ho%3A$(hostname)" --user $USER:$PASSWORD | grep "service=" | sed -e "s/.*service=//g" -e "s/&amp;.*//g" 2>/dev/null |
+curl --silent -L  "$URL/thruk/cgi-bin/status.cgi?hidesearch=2&s0_op=~&s0_type=search&s0_value=ho%3A$(hostname)" --user $USER:$PASSWORD | grep "service=" | sed 's/.*service=//g; s/&amp;.*//g' 2>/dev/null |
 while read check
 do
-	command=$(grep "\[$check\]" $CONFIG_FILE | tail -1 | sed -e "s/.*]\ *\?=//g")
+	command=$(sed -n -e '/\['$check'\]/h; ${x;s/.*=\(.*\)/\1/g;p;}' /tmp/checks_config)
 	if ! [ -z "$command" ] ; then
-		if [ "$SHOW" == "YES" ]; then
+		if [ "$SHOW" = "YES" ]; then
 			echo $(grep "\[$check\]" $CONFIG_FILE | tail -1)
 		fi
-		result=$(sudo -u nagios bash -c "$command" 2>/dev/null)
+		result=$(sudo -u nagios sh -c "$command" 2>/dev/null | sed -e 's/|.*//g')
 		case $? in
 			0)
-				echo -e "$(echo $OK | sed -e "s/MESSAGE/$check/g") - $(echo $result | sed -e 's/|.*//g')"
+				echo -n "$(echo $OK | sed -e "s/MESSAGE/$check/g") - "
 				;;
 			1)
-				echo -e "$(echo $WARNING | sed -e "s/MESSAGE/$check/g") - $(echo $result | sed -e 's/|.*//g')"
+				echo -n "$(echo $WARNING | sed -e "s/MESSAGE/$check/g") - "
 				;;
 			2)
-				echo -e "$(echo $CRITICAL | sed -e "s/MESSAGE/$check/g") - $(echo $result | sed -e 's/|.*//g')"
+				echo -n "$(echo $CRITICAL | sed -e "s/MESSAGE/$check/g") - "
 				;;
 		esac
+		echo $result
 	fi
 done
