@@ -40,7 +40,7 @@ grep -R "^command\[.*\]" /etc/nagios/nrpe* 2>/dev/null >> $CONFIG_FILE
 sort < $CONFIG_FILE | uniq > $TEMP_CONFIG_FILE
 mv $TEMP_CONFIG_FILE $CONFIG_FILE
 
-curl --silent -L  "$URL/thruk/cgi-bin/status.cgi?hidesearch=2&s0_op=~&s0_type=search&s0_value=ho%3A$(hostname -s)" --user $USER:$PASSWORD | grep "service=" | sed 's/.*service=//g; s/&amp;.*//g' 2>/dev/null |
+curl --silent -L  "$URL/thruk/cgi-bin/status.cgi?hidesearch=2&s0_op=~&s0_type=search&s0_value=ho%3A$(hostname)" --user $USER:$PASSWORD | grep "service=" | sed 's/.*service=//g; s/&amp;.*//g' 2>/dev/null |
 while read check
 do
 	command=$(sed -n -e '/\['$check'\]/h; ${x;s/.*=\(.*\)/\1/g;p;}' /tmp/checks_config)
