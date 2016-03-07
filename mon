@@ -14,7 +14,7 @@ while getopts ":s" OPTION; do
         esac
 done
 
-. $(dirname $0)/nagios_config
+. /etc/montor_config
 
 case $(uname) in
 	Linux)
