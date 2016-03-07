@@ -5,6 +5,8 @@ It will display it colorful in term of exit code of plugin
 - exit 1 - Yellow background  
 - exit 2 - Red background  
 
+Confuration file (montor_config) must me located under /etc
+
 # Usage
 - -s
         Prints nrpe configs which are used for execution of check locally
