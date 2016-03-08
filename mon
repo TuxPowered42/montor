@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 help_message="\n
 This programm gets list of checks for current host from nagios, puts it into a temp CONFIG_FILE\n
@@ -51,13 +51,13 @@ do
 		result=$(sudo -u nagios sh -c "$command" 2>/dev/null | sed -e 's/|.*//g')
 		case $? in
 			0)
-				echo -n "$(echo $OK | sed -e "s/MESSAGE/$check/g") - "
+				echo -en "$(echo $OK | sed -e "s/MESSAGE/$check/g") - "
 				;;
 			1)
-				echo -n "$(echo $WARNING | sed -e "s/MESSAGE/$check/g") - "
+				echo -en "$(echo $WARNING | sed -e "s/MESSAGE/$check/g") - "
 				;;
 			2)
-				echo -n "$(echo $CRITICAL | sed -e "s/MESSAGE/$check/g") - "
+				echo -en "$(echo $CRITICAL | sed -e "s/MESSAGE/$check/g") - "
 				;;
 		esac
 		echo $result
