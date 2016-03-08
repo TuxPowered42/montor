@@ -19,7 +19,7 @@ check_nofile_limit - OK
 check_ntp_peer - NTP OK: Offset 0 secs  
 check_swapping - OK - No swap activity  
 ...  
-![](https://3.downloader.disk.yandex.ru/disk/f423241fa113227243b06d0442e27bd97391bc6309e6f5139abf1739ab673705/56d9ed48/33-bZQkAwxR3vD43Wn86qYVRhGcYkSU5g8WGi2Xq0s-IO9dqVo_okBXajdg-QiCRSdCxIzpNcfhwDeFhp0xfuQ%3D%3D?uid=0&filename=montor.png&disposition=inline&hash=&limit=0&content_type=image%2Fpng&fsize=47770&hid=673f84c5158eb284661b01a7e674503c&media_type=image&tknv=v2&etag=1a287d8d1d61bbb4ee2aeb7ce7d5c274)
+![](https://3.downloader.disk.yandex.ru/disk/0f8f5497ff6e9cabcf52e568d2463c29abe9674e212d590bb2701b67b88687c2/56decbb8/33-bZQkAwxR3vD43Wn86qYVRhGcYkSU5g8WGi2Xq0s-IO9dqVo_okBXajdg-QiCRSdCxIzpNcfhwDeFhp0xfuQ%3D%3D?uid=0&filename=montor.png&disposition=inline&hash=&limit=0&content_type=image%2Fpng&fsize=47770&hid=673f84c5158eb284661b01a7e674503c&media_type=image&tknv=v2&etag=1a287d8d1d61bbb4ee2aeb7ce7d5c274)
 
 - mon -s  
 /etc/nagios/nrpe.d/igbase_debian.cfg:command[check_disk] = /usr/lib/nagios/plugins/check_disk -w 15% -c 5% -W 50% -K 5%  
