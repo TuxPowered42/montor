@@ -40,6 +40,10 @@ do
 		fi
 		result=$(sudo -u nagios sh -c "cd /tmp ; $command" )
 		eval CODE='$'EXIT_CODE_COLOR_$?
-                printf "\033[37;1;4%dm%s\033[0m - %s\n" "$CODE" "$check" "${result%%|*}"
+		if [ -t 1 ]; then
+			printf "\033[37;1;4%dm%s\033[0m - %s\n" "$CODE" "$check" "${result%%|*}"
+		else
+			printf "%s - %s\n" "$check" "${result%%|*}"
+		fi
 	fi
 done
